@@ -11,6 +11,7 @@ import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuPanelButton.PanelClickResult;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuPanelButton.PanelColor;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuPanelButton;
@@ -74,6 +75,7 @@ public class PatchesForPanel {
 			PanelClickResult result = (PanelClickResult) ReflectionHacks.getPrivate(b, MainMenuPanelButton.class, "result");
 			if (result == PLAY_CHALLENGE) {
 				logger.info("Challenge Button Panel clicked");
+				PatchesForChallengeModeScreen.Field.screen.get(CardCrawlGame.mainMenuScreen).open();
 			}
 		}
 	}
