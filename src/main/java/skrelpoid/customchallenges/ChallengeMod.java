@@ -17,6 +17,7 @@ public class ChallengeMod implements PostInitializeSubscriber {
 	public static final String UI = "ui/";
 
 	public static Texture MENU_PANEL;
+	public static Texture DEFAULT_ICON;
 
 	public static final String PANEL_TITLE = "Challenges";
 	public static final String PANEL_DESCRIPTION = "Play a custom challenge run";
@@ -34,5 +35,6 @@ public class ChallengeMod implements PostInitializeSubscriber {
 
 	public static void loadTextures() {
 		MENU_PANEL = ImageMaster.loadImage(RESOURCES + UI + "menuPanel.png");
+		DEFAULT_ICON = ImageMaster.loadImage(RESOURCES + UI + "defaultIcon.png");
 	}
 }
