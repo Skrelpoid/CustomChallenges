@@ -7,6 +7,7 @@ import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import basemod.BaseMod;
 import basemod.interfaces.PostInitializeSubscriber;
+import skrelpoid.customchallenges.api.Challenge;
 
 @SpireInitializer
 public class ChallengeMod implements PostInitializeSubscriber {
@@ -21,9 +22,16 @@ public class ChallengeMod implements PostInitializeSubscriber {
 
 	public static final String PANEL_TITLE = "Challenges";
 	public static final String PANEL_DESCRIPTION = "Play a custom challenge run";
+	
+	private static ChallengeManager challengeManager;
 
 	public static void initialize() {
 		BaseMod.subscribe(new ChallengeMod());
+		BaseMod.subscribe(challengeManager = new ChallengeManager());
+	}
+	
+	public static void startChallenge(Challenge challenge) {
+		challengeManager.setCurrentChallenge(challenge);
 	}
 
 	@Override
