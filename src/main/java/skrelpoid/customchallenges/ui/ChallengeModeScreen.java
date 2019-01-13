@@ -7,14 +7,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.megacrit.cardcrawl.characters.AbstractPlayer.PlayerClass;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
+import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.MathHelper;
+import com.megacrit.cardcrawl.helpers.ModHelper;
+import com.megacrit.cardcrawl.helpers.SeedHelper;
+import com.megacrit.cardcrawl.helpers.TrialHelper;
 import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
 import com.megacrit.cardcrawl.helpers.controller.CInputHelper;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
+import com.megacrit.cardcrawl.random.Random;
 import com.megacrit.cardcrawl.screens.charSelect.CharacterSelectScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBar;
@@ -31,7 +37,6 @@ public class ChallengeModeScreen implements ScrollBarListener {
 			new GridSelectConfirmButton(CharacterSelectScreen.TEXT[1]);
 	private Hitbox controllerHb;
 	public static boolean finalActAvailable;
-	public boolean isAscensionMode = false;
 	public int ascensionLevel = 0;
 	public boolean screenUp = false;
 	private static final float SHOW_X;
@@ -58,8 +63,12 @@ public class ChallengeModeScreen implements ScrollBarListener {
 		this.controllerHb = null;
 		this.targetY = 0.0f;
 		this.screenUp = true;
-		Settings.seed = null;
-		Settings.specialSeed = null;
+		Settings.isEndless = false;
+        Settings.seedSet = false;
+        Settings.seed = null;
+        Settings.specialSeed = null;
+        Settings.isTrial = false;
+        CardCrawlGame.trial = null;
 		CardCrawlGame.mainMenuScreen.screen = PatchesForChallengeModeScreen.CUSTOM_CHALLENGE;
 		CardCrawlGame.mainMenuScreen.darken();
 		this.cancelButton.show(CharacterSelectScreen.TEXT[5]);
@@ -101,9 +110,39 @@ public class ChallengeModeScreen implements ScrollBarListener {
 		this.confirmButton.update();
 		if (this.confirmButton.hb.clicked || CInputActionSet.proceed.isJustPressed()) {
 			logger.info("Clicked Confirm ChallengeModeScreen");
+			CardCrawlGame.chosenCharacter = PlayerClass.IRONCLAD;
 			this.confirmButton.hb.clicked = false;
+            this.confirmButton.isDisabled = true;
+            this.confirmButton.hide();
+			if (Settings.seed == null) {
+                this.setRandomSeed();
+            } else {
+                Settings.seedSet = true;
+            }
+			CardCrawlGame.mainMenuScreen.isFadingOut = true;
+            CardCrawlGame.mainMenuScreen.fadeOutMusic();
+            Settings.isDailyRun = false;
+            boolean isTrialSeed = TrialHelper.isTrialSeed(SeedHelper.getString(Settings.seed));
+            if (isTrialSeed) {
+                Settings.specialSeed = Settings.seed;
+                long sourceTime = System.nanoTime();
+                Random rng = new Random(sourceTime);
+                Settings.seed = SeedHelper.generateUnoffensiveSeed(rng);
+                Settings.isTrial = true;
+            }
+            ModHelper.setModsFalse();
+            AbstractDungeon.generateSeeds();
+            AbstractDungeon.isAscensionMode = false;
+            AbstractDungeon.ascensionLevel = 0;
 		}
 	}
+	
+	private void setRandomSeed() {
+        long sourceTime = System.nanoTime();
+        Random rng = new Random(sourceTime);
+        Settings.seedSourceTimestamp = sourceTime;
+        Settings.seed = SeedHelper.generateUnoffensiveSeed(rng);
+    }
 
 	public void render(SpriteBatch sb) {
 		this.renderScreen(sb);
