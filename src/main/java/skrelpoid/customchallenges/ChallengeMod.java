@@ -1,5 +1,8 @@
 package skrelpoid.customchallenges;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.badlogic.gdx.graphics.Texture;
@@ -22,16 +25,27 @@ public class ChallengeMod implements PostInitializeSubscriber {
 
 	public static final String PANEL_TITLE = "Challenges";
 	public static final String PANEL_DESCRIPTION = "Play a custom challenge run";
-	
+
+	public static List<Challenge> challengesLoaded = new ArrayList<>();
+
 	private static ChallengeManager challengeManager;
 
 	public static void initialize() {
 		BaseMod.subscribe(new ChallengeMod());
 		BaseMod.subscribe(challengeManager = new ChallengeManager());
 	}
-	
+
 	public static void startChallenge(Challenge challenge) {
 		challengeManager.setCurrentChallenge(challenge);
+	}
+
+	public static void registerChallenge(Challenge challenge) {
+		challengesLoaded.add(Objects.requireNonNull(challenge, "challenge may not be null"));
+	}
+	
+	public static boolean unregisterChallenge(String id) {
+		Objects.requireNonNull(id, "id may not be null");
+		return challengesLoaded.removeIf(c -> c.getId().equals(id));
 	}
 
 	@Override
