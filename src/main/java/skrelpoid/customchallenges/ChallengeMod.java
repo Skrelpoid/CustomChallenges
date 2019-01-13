@@ -1,6 +1,7 @@
 package skrelpoid.customchallenges;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
@@ -11,6 +12,8 @@ import com.megacrit.cardcrawl.helpers.ImageMaster;
 import basemod.BaseMod;
 import basemod.interfaces.PostInitializeSubscriber;
 import skrelpoid.customchallenges.api.Challenge;
+import skrelpoid.customchallenges.api.StartingDeckChanger;
+import skrelpoid.customchallenges.api.StartingRelicChanger;
 
 @SpireInitializer
 public class ChallengeMod implements PostInitializeSubscriber {
@@ -27,6 +30,7 @@ public class ChallengeMod implements PostInitializeSubscriber {
 	public static final String PANEL_DESCRIPTION = "Play a custom challenge run";
 
 	public static List<Challenge> challengesLoaded = new ArrayList<>();
+	public static Challenge testChallenge;
 
 	private static ChallengeManager challengeManager;
 
@@ -42,7 +46,7 @@ public class ChallengeMod implements PostInitializeSubscriber {
 	public static void registerChallenge(Challenge challenge) {
 		challengesLoaded.add(Objects.requireNonNull(challenge, "challenge may not be null"));
 	}
-	
+
 	public static boolean unregisterChallenge(String id) {
 		Objects.requireNonNull(id, "id may not be null");
 		return challengesLoaded.removeIf(c -> c.getId().equals(id));
@@ -53,6 +57,16 @@ public class ChallengeMod implements PostInitializeSubscriber {
 		logger.info("======================================");
 		logger.info("Custom Challenges was successfully loaded");
 		logger.info("======================================");
+		
+		testChallenge = new Challenge("test", "TEST", "TEST");
+		testChallenge.setStartingDeckChanger(new StartingDeckChanger(
+				Arrays.asList("Blur", "Blur", "Normality", "Strike_B", "Strike_G", "Strike_R",
+						"Defend_B", "Defend_G", "Defend_R", "sagemod:Quackster", "abcdguisduissd", "AscendersBane"),
+				true));
+		testChallenge.setStartingRelicChanger(
+				new StartingRelicChanger(Arrays.asList("Burning Blood",
+						"Potion Belt", "sagemod:Red_Beast_Statue", "hsjdudassadkidsa", "Strawberry", "Strawberry"), true));
+		logger.info("Created test Challenge");
 	}
 
 	public static void loadTextures() {

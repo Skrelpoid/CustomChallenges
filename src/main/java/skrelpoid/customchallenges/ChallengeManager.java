@@ -38,7 +38,7 @@ public class ChallengeManager
 					} else {
 						logger.info("Challenge with id " + currentChallenge.getId() + " added card "
 								+ str + " to the starting deck");
-						addCardsToMe.group.add(c);
+						addCardsToMe.group.add(c.makeCopy());
 					}
 				}
 			}
@@ -49,13 +49,13 @@ public class ChallengeManager
 	public void receivePostCreateStartingRelics(PlayerClass chosenClass,
 			ArrayList<String> addRelicsToMe) {
 		if (currentChallenge != null && currentChallenge.getStartingRelicChanger() != null) {
-			if (currentChallenge.getStartingDeckChanger().shouldRemoveDefault()) {
+			if (currentChallenge.getStartingRelicChanger().shouldRemoveDefault()) {
 				addRelicsToMe.clear();
 				logger.info("Challenge with id " + currentChallenge.getId()
 						+ " cleared the starting relics");
 			}
-			if (currentChallenge.getStartingDeckChanger().getCards() != null) {
-				for (String str : currentChallenge.getStartingDeckChanger().getCards()) {
+			if (currentChallenge.getStartingRelicChanger().getRelics() != null) {
+				for (String str : currentChallenge.getStartingRelicChanger().getRelics()) {
 					logger.info("Challenge with id " + currentChallenge.getId() + " added relic "
 							+ str + " to the starting relics");
 					addRelicsToMe.add(str);

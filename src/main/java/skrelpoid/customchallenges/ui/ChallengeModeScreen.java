@@ -26,6 +26,7 @@ import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBar;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBarListener;
 import com.megacrit.cardcrawl.ui.buttons.GridSelectConfirmButton;
+import skrelpoid.customchallenges.ChallengeMod;
 import skrelpoid.customchallenges.patches.PatchesForChallengeModeScreen;
 
 public class ChallengeModeScreen implements ScrollBarListener {
@@ -111,6 +112,7 @@ public class ChallengeModeScreen implements ScrollBarListener {
 		if (this.confirmButton.hb.clicked || CInputActionSet.proceed.isJustPressed()) {
 			logger.info("Clicked Confirm ChallengeModeScreen");
 			CardCrawlGame.chosenCharacter = PlayerClass.IRONCLAD;
+			ChallengeMod.startChallenge(ChallengeMod.testChallenge);
 			this.confirmButton.hb.clicked = false;
             this.confirmButton.isDisabled = true;
             this.confirmButton.hide();
