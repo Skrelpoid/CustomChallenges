@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR.
- */
 package skrelpoid.customchallenges.ui;
 
 import org.apache.logging.log4j.LogManager;
@@ -53,7 +50,7 @@ public class ChallengeModeScreen implements ScrollBarListener {
 	public ChallengeModeScreen() {
 		this.calculateScrollBounds(30);
 		this.scrollBar = new ScrollBar(this,
-				(float) Settings.WIDTH - 340.0f * Settings.scale - ScrollBar.TRACK_W / 2.0f,
+				(float) Settings.WIDTH - 740.0f * Settings.scale - ScrollBar.TRACK_W / 2.0f,
 				(float) Settings.HEIGHT / 2.0f, (float) Settings.HEIGHT - 256.0f * Settings.scale);
 		logger.info("Initialized ChallengeModeScreen");
 	}
