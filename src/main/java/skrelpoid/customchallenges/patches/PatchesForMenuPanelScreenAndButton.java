@@ -20,9 +20,9 @@ import basemod.ReflectionHacks;
 import javassist.CtBehavior;
 import skrelpoid.customchallenges.ChallengeMod;
 
-public class PatchesForPanel {
+public class PatchesForMenuPanelScreenAndButton {
 	
-	public static final Logger logger = LogManager.getLogger(PatchesForPanel.class.getName());
+	public static final Logger logger = LogManager.getLogger(PatchesForMenuPanelScreenAndButton.class.getName());
 	
 	@SpireEnum
 	public static PanelClickResult PLAY_CHALLENGE;
