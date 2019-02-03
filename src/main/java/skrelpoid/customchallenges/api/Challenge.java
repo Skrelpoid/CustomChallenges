@@ -46,8 +46,8 @@ public class Challenge {
 	 */
 	public Challenge(String id, String name, String description, Texture image) {
 		this.id = Objects.requireNonNull(id, "id must not be null");
-		this.name = name;
-		this.description = description;
+		this.name = Objects.requireNonNull(name, "name must not be null");
+		this.description = Objects.requireNonNull(description, "description must not be null");
 		this.image = image == null ? ChallengeMod.DEFAULT_ICON : image;
 	}
 
