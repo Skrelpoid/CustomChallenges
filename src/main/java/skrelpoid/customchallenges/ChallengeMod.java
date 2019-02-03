@@ -58,7 +58,7 @@ public class ChallengeMod implements PostInitializeSubscriber {
 		logger.info("Custom Challenges was successfully loaded");
 		logger.info("======================================");
 		
-		testChallenge = new Challenge("test", "TEST", "TEST");
+		testChallenge = new Challenge("test", "TEST TEST ETST TETS willkommmen tetst idjsiisdids hasohiasdoi sd saoihdhoid ", "TEST");
 		testChallenge.setStartingDeckChanger(new StartingDeckChanger(
 				Arrays.asList("Blur", "Blur", "Normality", "Strike_B", "Strike_G", "Strike_R",
 						"Defend_B", "Defend_G", "Defend_R", "sagemod:Quackster", "abcdguisduissd", "AscendersBane"),
@@ -67,6 +67,9 @@ public class ChallengeMod implements PostInitializeSubscriber {
 				new StartingRelicChanger(Arrays.asList("Burning Blood",
 						"Potion Belt", "sagemod:Red_Beast_Statue", "hsjdudassadkidsa", "Strawberry", "Strawberry"), true));
 		logger.info("Created test Challenge");
+		for (int i = 0; i <5; i++) {
+			registerChallenge(testChallenge);
+		}
 	}
 
 	public static void loadTextures() {

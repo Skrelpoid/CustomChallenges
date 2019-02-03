@@ -1,5 +1,8 @@
 package skrelpoid.customchallenges.ui;
 
+import static skrelpoid.customchallenges.ChallengeMod.challengesLoaded;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.badlogic.gdx.Gdx;
@@ -19,6 +22,7 @@ import com.megacrit.cardcrawl.helpers.controller.CInputHelper;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.random.Random;
 import com.megacrit.cardcrawl.screens.charSelect.CharacterSelectScreen;
+import com.megacrit.cardcrawl.screens.custom.CustomModeScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBar;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBarListener;
@@ -26,18 +30,23 @@ import com.megacrit.cardcrawl.ui.buttons.GridSelectConfirmButton;
 import skrelpoid.customchallenges.ChallengeMod;
 import skrelpoid.customchallenges.patches.PatchesForChallengeModeScreen;
 
+/**
+ * @see CharacterSelectScreen
+ * @see CustomModeScreen
+ */
 public class ChallengeModeScreen implements ScrollBarListener {
 	public static final Logger logger = LogManager.getLogger(ChallengeModeScreen.class.getName());
-	
-	public static final String[] TEXT = {"Challenges", "Coming Soon"};
+
+	public static final String[] TEXT = {"Challenges"};
+	public static final int OFFSET_Y = 600;
 	private MenuCancelButton cancelButton = new MenuCancelButton();
 	public GridSelectConfirmButton confirmButton =
 			new GridSelectConfirmButton(CharacterSelectScreen.TEXT[1]);
 	private Hitbox controllerHb;
-	public static boolean finalActAvailable;
+	public static boolean finalActAvailable = false;
 	public int ascensionLevel = 0;
 	public boolean screenUp = false;
-	private static final float SHOW_X;
+	private static final float SHOW_X = 300.0f * Settings.scale;;
 	private float screenX = SHOW_X;
 	private boolean grabbedScreen = false;
 	private float grabStartY = 0.0f;
@@ -46,11 +55,18 @@ public class ChallengeModeScreen implements ScrollBarListener {
 	private float scrollLowerBound;
 	private float scrollUpperBound;
 	private ScrollBar scrollBar;
+	private List<ChallengeButton> challenges;
 
 	public ChallengeModeScreen() {
-		this.calculateScrollBounds(30);
+		challenges = challengesLoaded.stream().map(ChallengeButton::new).collect(Collectors.toList());
+		int index = 0;
+		for (ChallengeButton b : challenges) {
+			b.setBaseY(OFFSET_Y * Settings.scale - index * ChallengeButton.HEIGHT * Settings.scale);
+			index++;
+		}
+		this.calculateScrollBounds(challenges.size());
 		this.scrollBar = new ScrollBar(this,
-				(float) Settings.WIDTH - 740.0f * Settings.scale - ScrollBar.TRACK_W / 2.0f,
+				(float) Settings.WIDTH - (ChallengeButton.X_OFFSET + ChallengeButton.WIDTH) * Settings.scale - ScrollBar.TRACK_W / 2.0f,
 				(float) Settings.HEIGHT / 2.0f, (float) Settings.HEIGHT - 256.0f * Settings.scale);
 		logger.info("Initialized ChallengeModeScreen");
 	}
@@ -62,11 +78,11 @@ public class ChallengeModeScreen implements ScrollBarListener {
 		this.targetY = 0.0f;
 		this.screenUp = true;
 		Settings.isEndless = false;
-        Settings.seedSet = false;
-        Settings.seed = null;
-        Settings.specialSeed = null;
-        Settings.isTrial = false;
-        CardCrawlGame.trial = null;
+		Settings.seedSet = false;
+		Settings.seed = null;
+		Settings.specialSeed = null;
+		Settings.isTrial = false;
+		CardCrawlGame.trial = null;
 		CardCrawlGame.mainMenuScreen.screen = PatchesForChallengeModeScreen.CUSTOM_CHALLENGE;
 		CardCrawlGame.mainMenuScreen.darken();
 		this.cancelButton.show(CharacterSelectScreen.TEXT[5]);
@@ -86,6 +102,7 @@ public class ChallengeModeScreen implements ScrollBarListener {
 		if (!isDraggingScrollBar) {
 			this.updateScrolling();
 		}
+		updateChallenges();
 		this.updateEmbarkButton();
 		this.updateCancelButton();
 		if (Settings.isControllerMode && this.controllerHb != null) {
@@ -111,59 +128,65 @@ public class ChallengeModeScreen implements ScrollBarListener {
 			CardCrawlGame.chosenCharacter = PlayerClass.IRONCLAD;
 			ChallengeMod.startChallenge(ChallengeMod.testChallenge);
 			this.confirmButton.hb.clicked = false;
-            this.confirmButton.isDisabled = true;
-            this.confirmButton.hide();
+			this.confirmButton.isDisabled = true;
+			this.confirmButton.hide();
 			if (Settings.seed == null) {
-                this.setRandomSeed();
-            } else {
-                Settings.seedSet = true;
-            }
+				this.setRandomSeed();
+			} else {
+				Settings.seedSet = true;
+			}
 			CardCrawlGame.mainMenuScreen.isFadingOut = true;
-            CardCrawlGame.mainMenuScreen.fadeOutMusic();
-            Settings.isDailyRun = false;
-            boolean isTrialSeed = TrialHelper.isTrialSeed(SeedHelper.getString(Settings.seed));
-            if (isTrialSeed) {
-                Settings.specialSeed = Settings.seed;
-                long sourceTime = System.nanoTime();
-                Random rng = new Random(sourceTime);
-                Settings.seed = SeedHelper.generateUnoffensiveSeed(rng);
-                Settings.isTrial = true;
-            }
-            ModHelper.setModsFalse();
-            AbstractDungeon.generateSeeds();
-            AbstractDungeon.isAscensionMode = false;
-            AbstractDungeon.ascensionLevel = 0;
+			CardCrawlGame.mainMenuScreen.fadeOutMusic();
+			Settings.isDailyRun = false;
+			boolean isTrialSeed = TrialHelper.isTrialSeed(SeedHelper.getString(Settings.seed));
+			if (isTrialSeed) {
+				Settings.specialSeed = Settings.seed;
+				long sourceTime = System.nanoTime();
+				Random rng = new Random(sourceTime);
+				Settings.seed = SeedHelper.generateUnoffensiveSeed(rng);
+				Settings.isTrial = true;
+			}
+			ModHelper.setModsFalse();
+			AbstractDungeon.generateSeeds();
+			AbstractDungeon.isAscensionMode = false;
+			AbstractDungeon.ascensionLevel = 0;
 		}
 	}
-	
+
 	private void setRandomSeed() {
-        long sourceTime = System.nanoTime();
-        Random rng = new Random(sourceTime);
-        Settings.seedSourceTimestamp = sourceTime;
-        Settings.seed = SeedHelper.generateUnoffensiveSeed(rng);
-    }
+		long sourceTime = System.nanoTime();
+		Random rng = new Random(sourceTime);
+		Settings.seedSourceTimestamp = sourceTime;
+		Settings.seed = SeedHelper.generateUnoffensiveSeed(rng);
+	}
 
 	public void render(SpriteBatch sb) {
 		this.renderScreen(sb);
 		this.scrollBar.render(sb);
 		this.cancelButton.render(sb);
 		this.confirmButton.render(sb);
+		renderChallenges(sb);
 	}
 
 	public void renderScreen(SpriteBatch sb) {
 		this.renderTitle(sb, TEXT[0], this.scrollY - 50.0f * Settings.scale);
-		this.renderHeader(sb, TEXT[1], this.scrollY - 120.0f * Settings.scale);
-	}
-
-	private void renderHeader(SpriteBatch sb, String text, float y) {
-		FontHelper.renderSmartText(sb, FontHelper.deckBannerFont, text,
-				this.screenX + 50.0f * Settings.scale, y + 850.0f * Settings.scale, 9999.0f,
-				32.0f * Settings.scale, Settings.GOLD_COLOR);
 	}
 
 	private void renderTitle(SpriteBatch sb, String text, float y) {
 		FontHelper.renderSmartText(sb, FontHelper.charTitleFont, text, this.screenX,
 				y + 900.0f * Settings.scale, 9999.0f, 32.0f * Settings.scale, Settings.GOLD_COLOR);
+	}
+	
+	private void updateChallenges() {
+		for (ChallengeButton b : challenges) {
+			b.update(scrollY);
+		}
+	}
+
+	private void renderChallenges(SpriteBatch sb) {
+		for (ChallengeButton b : challenges) {
+			b.render(sb);
+		}
 	}
 
 	private void updateControllerInput() {
@@ -202,8 +225,8 @@ public class ChallengeModeScreen implements ScrollBarListener {
 
 	private void calculateScrollBounds(int rows) {
 		this.scrollUpperBound =
-				(float) rows * 90.0f * Settings.scale + 270.0f * Settings.scale;
-		this.scrollLowerBound = 100.0f * Settings.scale;
+				(float) rows * ChallengeButton.HEIGHT * Settings.scale - OFFSET_Y * Settings.scale ;
+		this.scrollLowerBound = 0;
 	}
 
 	@Override
@@ -221,10 +244,4 @@ public class ChallengeModeScreen implements ScrollBarListener {
 		this.scrollBar.parentScrolledToPercent(percent);
 	}
 
-	static {
-		finalActAvailable = false;
-		SHOW_X = 300.0f * Settings.scale;
-	}
-
 }
-
